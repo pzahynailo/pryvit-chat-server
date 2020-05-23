@@ -32,7 +32,8 @@ export class EventsGateway implements OnModuleInit {
             user: {
                 username: data.user.username,
                 _id: data.user._id
-            }
+            },
+            date: new Date()
         }
         const updatedRoom: Room = await this.roomModel.findOneAndUpdate({_id: new ObjectId(data.room)},
             {$push: {messages: message}});

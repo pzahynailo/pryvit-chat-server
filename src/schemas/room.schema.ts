@@ -10,7 +10,8 @@ export const RoomSchema = new mongoose.Schema({
             username: String,
             _id: String
         },
-        text: String
+        text: String,
+        date: Date
     } ],
     date: {type: Date, default: Date.now}
 });
