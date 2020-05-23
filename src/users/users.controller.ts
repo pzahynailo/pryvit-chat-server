@@ -55,9 +55,9 @@ export class UsersController {
     @HttpCode(HttpStatus.OK)
     @UseGuards(JwtAuthGuard)
     @Get('/get-profile')
-    async getProfile(@Req() request): Promise<JwtVerifyAnswer> {
+    async getProfile(@Req() request): Promise<User> {
         try {
-            return {username: request.user.username};
+            return request.user;
         } catch (err) {
             throw new HttpException(new CommonResult(false, 'Unexpected token'), HttpStatus.UNAUTHORIZED);
         }

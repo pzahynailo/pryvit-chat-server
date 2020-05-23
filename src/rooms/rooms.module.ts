@@ -1,10 +1,8 @@
-import { UserSchema } from '../schemas/user.schema';
-import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { RoomsController } from './rooms.controller';
 import { RoomsService } from './rooms.service';
 import { MongooseModule } from '@nestjs/mongoose';
-// import { CorsMiddleware } from '../middlewares/cors.middleware';
-import { RoomSchema } from './../schemas/room.schema';
+import { RoomSchema } from '../schemas/room.schema';
 import { EventsGateway } from '../events.gateway';
 
 @Module({
