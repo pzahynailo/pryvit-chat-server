@@ -26,13 +26,20 @@ export class EventsGateway implements OnModuleInit {
     }
 
     @SubscribeMessage('message')
-    async message(client: Socket, data): Promise<GatewayEventInterface<{ text: string, username: string, room: Room }>> {
+    async message(client: Socket, data): Promise<GatewayEventInterface<{ text: string, user: { username: string, _id: string }, room: Room }>> {
+        const message = {
+            text: data.message,
+            user: {
+                username: data.user.username,
+                _id: data.user._id
+            },
+            date: new Date()
+        }
         const updatedRoom: Room = await this.roomModel.findOneAndUpdate({_id: new ObjectId(data.room)},
-            {$push: {messages: {username: data.username, text: data.message}}});
+            {$push: {messages: message}});
         const event = 'message';
-        const payload = {text: data.message, username: data.username, room: data.room};
-        client.to(data.room).emit(event, payload);
-        return {event, data: payload};
+        client.to(data.room).emit(event, message);
+        return {event, data: {...message, room: updatedRoom}};
     }
 
     @SubscribeMessage('addroom')
