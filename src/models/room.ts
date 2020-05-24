@@ -7,6 +7,9 @@ export class Room {
             username: string;
         },
         text: string;
+        date: Date;
     }>;
     date: string;
+    lastMessage?: string;
+    lastMessageDate?: Date;
 }

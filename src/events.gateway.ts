@@ -33,7 +33,6 @@ export class EventsGateway implements OnModuleInit, OnGatewayConnection {
 
     @SubscribeMessage('message')
     async message(client: Socket, data): Promise<void> {
-        console.log(data);
         const message = {
             text: data.message,
             user: {
@@ -45,7 +44,7 @@ export class EventsGateway implements OnModuleInit, OnGatewayConnection {
         const updatedRoom: Room = await this.roomModel.findOneAndUpdate({_id: new ObjectId(data.roomId)},
             {$push: {messages: message}});
         const event = 'sendMessage';
-        client.broadcast.emit(event, {...message, room: updatedRoom._id});
+        this.server.emit(event, {...message, room: updatedRoom._id});
     }
 
     @SubscribeMessage('addroom')

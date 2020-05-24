@@ -19,9 +19,12 @@ export class RoomsController {
             return allRooms.map(elem => {
                 const newElem = {...elem};
                 delete newElem.messages;
+                let lastMessage = elem.messages[elem.messages.length - 1];
+                newElem.lastMessage = lastMessage ? lastMessage.text : null;
+                newElem.lastMessageDate = lastMessage ? lastMessage.date : null;
                 return newElem;
             }).sort((a, b) => {
-                return (b.date ? new Date(b.date).getTime() : 0) - (a.date ? new Date(a.date).getTime() : 0);
+                return this.getDateForRoom(b) - this.getDateForRoom(a);
             });
         } catch (err) {
             throw new HttpException(new CommonResult(false, 'Server error'), HttpStatus.BAD_REQUEST);
@@ -36,6 +39,11 @@ export class RoomsController {
         } catch (err) {
             throw new HttpException(new CommonResult(false, 'Server error'), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    private getDateForRoom(room: Room) {
+        const date = room.lastMessageDate;
+        return date ? new Date(date).getTime() : 0;
     }
 }
 
