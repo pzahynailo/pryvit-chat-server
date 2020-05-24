@@ -26,7 +26,7 @@ export class UsersController {
     constructor(
         private readonly usersService: UsersService,
         @Inject(forwardRef(() => AuthService))
-        private readonly authSesrvice: AuthService,
+        private readonly authService: AuthService,
     ) {
     }
 
