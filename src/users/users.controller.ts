@@ -57,7 +57,9 @@ export class UsersController {
     @Get('/get-profile')
     async getProfile(@Req() request): Promise<User> {
         try {
-            return request.user;
+            const user: User = await this.usersService.findOne(request.user.username);
+            delete user.password;
+            return user;
         } catch (err) {
             throw new HttpException(new CommonResult(false, 'Unexpected token'), HttpStatus.UNAUTHORIZED);
         }

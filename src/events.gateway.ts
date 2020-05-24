@@ -1,6 +1,6 @@
 import { OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import * as mongoose from 'mongoose';
 import { Server, Socket } from 'socket.io';
 import * as socketioJwt from 'socketio-jwt';
@@ -11,7 +11,7 @@ import { User } from './models/user';
 const ObjectId = mongoose.Types.ObjectId;
 
 @WebSocketGateway()
-export class EventsGateway implements OnModuleInit {
+export class EventsGateway implements OnModuleInit, OnGatewayConnection {
     constructor(@InjectModel('Room') private roomModel) {
     }
 
@@ -25,8 +25,15 @@ export class EventsGateway implements OnModuleInit {
         }));
     }
 
+    public handleConnection(client: any) {
+        client.on('error', (err) => {
+            console.log(err);
+        });
+    }
+
     @SubscribeMessage('message')
-    async message(client: Socket, data): Promise<GatewayEventInterface<{ text: string, user: { username: string, _id: string }, room: Room }>> {
+    async message(client: Socket, data): Promise<void> {
+        console.log(data);
         const message = {
             text: data.message,
             user: {
@@ -35,11 +42,10 @@ export class EventsGateway implements OnModuleInit {
             },
             date: new Date()
         }
-        const updatedRoom: Room = await this.roomModel.findOneAndUpdate({_id: new ObjectId(data.room)},
+        const updatedRoom: Room = await this.roomModel.findOneAndUpdate({_id: new ObjectId(data.roomId)},
             {$push: {messages: message}});
-        const event = 'message';
-        client.to(data.room).emit(event, message);
-        return {event, data: {...message, room: updatedRoom}};
+        const event = 'sendMessage';
+        client.broadcast.emit(event, {...message, room: updatedRoom._id});
     }
 
     @SubscribeMessage('addroom')
@@ -47,10 +53,10 @@ export class EventsGateway implements OnModuleInit {
         const room: string = data;
         let newRoom: Room = await this.roomModel.findOne({title: room});
         if (newRoom) {
-            client.emit('rooms', 'hello its voice from room');
+            client.emit('rooms', 'room is already created');
         } else {
             newRoom = await this.roomModel.create({title: room});
-            client.emit('updatedRooms', newRoom);
+            this.server.emit('updatedRooms', newRoom);
         }
     }
 

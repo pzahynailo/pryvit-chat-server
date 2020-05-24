@@ -17,9 +17,9 @@ const getMongoUrl = () => {
 
 @Module({
     imports: [
-        ServeStaticModule.forRoot({
-            rootPath: join(__dirname, '../../dist'),
-        }),
+        // ServeStaticModule.forRoot({
+        //     rootPath: join(__dirname, '../../dist'),
+        // }),
         MongooseModule.forRoot(getMongoUrl()),
         UsersModule,
         RoomsModule,
